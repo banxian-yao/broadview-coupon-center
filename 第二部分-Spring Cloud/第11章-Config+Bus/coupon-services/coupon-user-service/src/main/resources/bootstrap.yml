@@ -1,0 +1,16 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10000/eureka/
+
+spring:
+  cloud:
+    config:
+      discovery:
+        # 通过eureka的服务发现机制连接到配置中心实例
+        enabled: true
+        service-id: config-server
+      # 环境变量为dev
+      profile: dev
+      # 从main分支读取信息（必须）
+      label: main
