@@ -1,0 +1,13 @@
+server:
+  port: 20001
+#  servlet:
+#    context-path: /coupon-calculation
+
+spring:
+  application:
+    name: coupon-calculator-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://peer1:10000/eureka/,http://peer2:10001/eureka/
