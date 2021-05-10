@@ -1,0 +1,209 @@
+server:
+  port: 20002
+#  servlet:
+#    context-path: /coupon-user
+
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  application:
+    name: coupon-user-service
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.format_sql: true
+      hibernate.show_sql: true
+    open-in-view: false
+
+  datasource:
+    # 数据源
+    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
+    username: canal
+    password: canal
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接池
+    hikari:
+      connection-timeout: 20000
+      idle-timeout: 20000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      max-lifetime: 30000
+      auto-commit: true
+      pool-name: BroadviewCouponHikari
+  sleuth:
+    sampler:
+      probability: 1
+  cloud:
+    stream:
+      bindings:
+        coupon-consumer:
+          destination: request-coupon-topic
+          # 消费组，同组内只能被消费一次
+          group: coupon-user-serv-group
+          # 本机重试，次数>1的时候才重试
+          # 如果设置了requeue操作，则需要把max-attempts设置为1
+          consumer:
+            max-attempts: 1
+        coupon-producer:
+          destination: request-coupon-topic
+      rabbit:
+        bindings:
+          coupon-producer:
+            producer:
+              delayed-exchange: true
+          coupon-consumer:
+            consumer:
+              auto-bind-dlq: true
+#              requeue-rejected: true
+
+
+  zipkin:
+    sender:
+      type: rabbit
+    rabbitmq:
+      addresses: 127.0.0.1:5672
+      queue: zipkin
+#    sender:
+#    type: web
+    # 直连zipkin形式
+#    discovery-client-enabled: false
+#    base-url: http://localhost:30000
+    # 基于服务发现直连形式
+#    discovery-client-enabled: true
+#    base-url: http://zipkin-server
+#    locator:
+#      discovery:
+#        enabled: true
+
+#  redis:
+#    database: 0
+#    host: 127.0.0.1
+#    port: 6379
+#    # password:
+#    # 连接超时时间
+#    timeout: 10000
+#  kafka:
+#    bootstrap-servers:
+#      - localhost:9092
+#    consumer:
+#      group-id: broadview-test
+#      auto-offset-reset: latest
+
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:10000/eureka/
+
+# Ribbon全局配置
+# 如果配置了Feign接口超时，那么ribbon超时配置则不生效
+ribbon:
+  ConnectTimeout: 1000 #服务请求连接超时时间（毫秒）
+  ReadTimeout: 1000 #服务请求处理超时时间（毫秒）
+  OkToRetryOnAllOperations: true #对超时请求启用重试机制
+  MaxAutoRetriesNextServer: 2 #切换重试实例的最大个数
+  MaxAutoRetries: 1 # 切换实例后重试最大次数
+
+# 发送到coupon-template-service服务的负载均衡配置
+# 如果配置了Feign接口超时，那么ribbon超时配置则不生效
+coupon-template-service:
+  ribbon:
+    # 指定负载均衡策略为随机访问策略
+    # 一般采用默认的RoundRobin负载均衡策略
+    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+    # 指定IPing策略（一般策略中不指定IPing），配合Feign使用
+    NFLoadBalancerPingClassName: com.netflix.niws.loadbalancer.NIWSDiscoveryPing
+    ConnectTimeout: 1000 #服务请求连接超时时间（毫秒）
+    ReadTimeout: 1000 #服务请求处理超时时间（毫秒）
+    OkToRetryOnAllOperations: true #对超时请求启用重试机制
+    MaxAutoRetriesNextServer: 1 #切换重试实例的最大个数
+    MaxAutoRetries: 1 # 切换实例后重试最大次数
+
+
+# 将TemplateClient类的日志级别设置为debug
+logging:
+  level:
+    com.broadview.coupon.user.external.TemplateClient: debug
+
+
+# feign 配置
+feign:
+  hystrix:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 1024
+    response:
+      enabled: true
+  client:
+    config:
+      default:  # 全局生效
+        connectTimeout: 1000  # 默认的连接超时时间是 10s
+        readTimeout: 5000
+      coupon-template-service:  # 单独服务的配置
+        connectTimeout: 1000  # 默认的连接超时时间是 10s
+        readTimeout: 5000
+
+
+
+hystrix:
+  metrics:
+    enabled: true
+  command:
+    # 此处添加HystrixCommand中配置的commandKey
+#    requestCouponKey:
+#      execution:
+#        isolation:
+#          thread:
+#            #requestCoupon的超时时间
+#            timeoutInMilliseconds: 2000
+    default:
+      fallback:
+        enabled: true # 开启降级（默认处于开启状态）
+      circuitBreaker:
+        enabled: true #开启/禁用熔断机制（默认开启）
+        requestVolumeThreshold: 4 # 断路器请求阈值
+        sleepWindowInMilliseconds: 10000 # 断路器等待窗口
+        errorThresholdPercentage: 50 # 断路器错误百分比（触发条件）
+      metrics:
+        rollingStats:
+          timeInMilliseconds: 20000 #滑动窗口持续时间
+#          numBuckets: 10 #滑动窗口中bucket数量
+#        rollingPercentile:
+#          enabled: true #是否执行时间百分比信息
+#          timeInMilliseconds: 60000 #执行时间统计周期
+#          numBuckets: 6 #执行时间统计内的bucket数量
+#          bucketSize: 1000 #每个bucket最多统计的记录条数
+#        healthSnapshot:
+#          intervalInMilliseconds: 500 #健康快照信息采集间隔
+      execution:
+        timeout:
+          #是否允许超时
+          enabled: true
+        isolation:
+          thread:
+            timeoutInMilliseconds: 3000 # 全局超时时间
+            interruptOnTimeout: true # 超时后是否中断线程
+            interruptOnCancel: true # 取消调用后是否中断线程
+          semaphore:
+            maxConcurrentRequests: 10 #最大并发请求数
+
+#management:
+#  endpoint:
+#    health:
+#      # 总是显示各个组件的actuator信息
+#      show-details: always
+#  endpoints:
+#    web:
+#      exposure:
+#        # 暴露所有endpoint
+#        include: '*'
+#  security:
+#    enabled: false
