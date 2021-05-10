@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: coupon-turbine
+
+server:
+  # 指定一个不同端口号
+  port: 10002
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10000/eureka/
+
+turbine:
+  aggregator:
+    # 默认集群，生产环境可指定需要采集信息的目标集群
+    cluster-config: default
+  # 配置监听application的名称，多个name之间用逗号间隔
+  app-config: coupon-user-service
+  cluster-name-expression: '"default"'
+  # 根据host和port的形式
+  combine-host-port: true
+  instanceUrlSuffix:
+    default: actuator/hystrix.stream
