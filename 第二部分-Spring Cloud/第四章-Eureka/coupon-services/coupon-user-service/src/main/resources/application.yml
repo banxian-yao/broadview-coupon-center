@@ -1,0 +1,65 @@
+server:
+  port: 20002
+#  servlet:
+#    context-path: /coupon-user
+
+spring:
+  application:
+    name: coupon-user-service
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.format_sql: true
+      hibernate.show_sql: true
+    open-in-view: false
+
+  datasource:
+    # 数据源
+    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
+    username: root
+    password: Broadview
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接池
+    hikari:
+      connection-timeout: 20000
+      idle-timeout: 20000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      max-lifetime: 30000
+      auto-commit: true
+      pool-name: BroadviewCouponHikari
+#  redis:
+#    database: 0
+#    host: 127.0.0.1
+#    port: 6379
+#    # password:
+#    # 连接超时时间
+#    timeout: 10000
+#  kafka:
+#    bootstrap-servers:
+#      - localhost:9092
+#    consumer:
+#      group-id: broadview-test
+#      auto-offset-reset: latest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10000/eureka/
+
+# feign 配置
+feign:
+  hystrix:
+    enabled: true   # Hystrix功能开启
+  client:
+    config:
+      default:  # 全局生效
+        connectTimeout: 1000  # 默认的连接超时时间是 10s
+        readTimeout: 5000
+
+      coupon-template-service:  # 单独服务的配置
+        connectTimeout: 5000  # 默认的连接超时时间是 10s
+        readTimeout: 10000
