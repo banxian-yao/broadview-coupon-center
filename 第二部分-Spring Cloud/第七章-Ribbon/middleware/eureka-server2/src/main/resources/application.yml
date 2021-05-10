@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: coupon-eureka
+
+server:
+  # 端口号与peer1不同
+  port: 10001
+
+eureka:
+  instance:
+    # hostname指定为peer2
+    hostname: peer2
+  client:
+    fetch-registry: false
+    register-with-eureka: true
+    # 将自己注册到peer1
+    service-url:
+      defaultZone: http://peer1:10000/eureka
