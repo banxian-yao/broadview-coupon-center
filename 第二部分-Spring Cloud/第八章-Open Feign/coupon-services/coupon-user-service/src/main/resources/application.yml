@@ -1,0 +1,98 @@
+server:
+  port: 20002
+#  servlet:
+#    context-path: /coupon-user
+
+spring:
+  application:
+    name: coupon-user-service
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.format_sql: true
+      hibernate.show_sql: true
+    open-in-view: false
+
+  datasource:
+    # 数据源
+    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
+    username: canal
+    password: canal
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接池
+    hikari:
+      connection-timeout: 20000
+      idle-timeout: 20000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      max-lifetime: 30000
+      auto-commit: true
+      pool-name: BroadviewCouponHikari
+#  redis:
+#    database: 0
+#    host: 127.0.0.1
+#    port: 6379
+#    # password:
+#    # 连接超时时间
+#    timeout: 10000
+#  kafka:
+#    bootstrap-servers:
+#      - localhost:9092
+#    consumer:
+#      group-id: broadview-test
+#      auto-offset-reset: latest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:10000/eureka/
+
+#ribbon:
+#  ConnectTimeout: 1000 #服务请求连接超时时间（毫秒）
+#  ReadTimeout: 1000 #服务请求处理超时时间（毫秒）
+#  OkToRetryOnAllOperations: true #对超时请求启用重试机制
+#  MaxAutoRetriesNextServer: 2 #切换重试实例的最大个数
+#  MaxAutoRetries: 1 # 切换实例后重试最大次数
+
+# 发送到coupon-template-service服务的负载均衡配置
+#coupon-template-service:
+#  ribbon:
+#    # 指定负载均衡策略为随机访问策略
+#    # 一般采用默认的RoundRobin负载均衡策略
+#    NFLoadBalancerRuleClassName: com.netflix.loadbalancer.RandomRule
+#    # 指定IPing策略（一般策略中不指定IPing），配合Feign使用
+#    NFLoadBalancerPingClassName: com.netflix.niws.loadbalancer.NIWSDiscoveryPing
+#    ConnectTimeout: 1000 #服务请求连接超时时间（毫秒）
+#    ReadTimeout: 3000 #服务请求处理超时时间（毫秒）
+#    OkToRetryOnAllOperations: true #对超时请求启用重试机制
+#    MaxAutoRetriesNextServer: 1 #切换重试实例的最大个数
+#    MaxAutoRetries: 1 # 切换实例后重试最大次数
+
+
+# 将TemplateClient类的日志级别设置为debug
+logging:
+  level:
+    com.broadview.coupon.user.external.TemplateClient: debug
+
+# feign 配置
+feign:
+  compression:
+    request:
+      enabled: true
+      mime-types: text/xml,application/xml,application/json
+      min-request-size: 1024
+    response:
+      enabled: true
+  #  hystrix:
+#    enabled: true   # Hystrix功能开启
+  client:
+    config:
+      default:  # 全局生效
+        connectTimeout: 1000  # 默认的连接超时时间是 10s
+        readTimeout: 5000
+      coupon-template-service:  # 单独服务的配置
+        connectTimeout: 1000  # 默认的连接超时时间是 10s
+        readTimeout: 4000
