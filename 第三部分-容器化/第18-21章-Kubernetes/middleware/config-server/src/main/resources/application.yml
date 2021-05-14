@@ -1,0 +1,57 @@
+server:
+  port: 10004
+
+spring:
+  application:
+    name: config-server
+  # rabbit mq连接信息，用于bus批量推送
+  rabbitmq:
+    host: rabbitmq-rabbitmq-ha
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    config:
+      server:
+        default-label: main
+        # 可以定义属性重载
+        overrides:
+          mytest: mytest_value
+        # github的连接信息
+        git:
+          uri: https://github.com/banxian-yao/coupon-center-config.git
+          force-pull: true
+          # 可以配置访问git的用户名密码
+          # username:
+          # password:
+          # 处理SSL连接异常
+          skip-ssl-validation: true
+          search-paths: '{application}'
+          # 该配置项用来指定本地文件保存的路径
+          # basedir: /Users/viyao/Downloads/test
+          repos:
+            # 当应用请求满足以下pattern规则的时候，则从下面的URI里获取配置文件
+            test-service-2:
+              pattern: foo*/dev*,*service*/test*
+              uri: https://github.com/banxian-yao/foodie-cloud-config
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-0.eureka:10000/eureka/,http://eureka-1.eureka:10000/eureka/
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}.${server.port}
+    prefer-ip-address: true
+
+management:
+  endpoint:
+    health:
+      # 总是显示各个组件的actuator信息
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        # 暴露所有endpoint
+        include: '*'
+  security:
+    enabled: false

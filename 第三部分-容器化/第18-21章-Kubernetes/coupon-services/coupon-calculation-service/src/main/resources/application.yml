@@ -1,0 +1,23 @@
+server:
+  port: 20001
+#  servlet:
+#    context-path: /coupon-calculation
+
+spring:
+  application:
+    name: coupon-calculator-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-0.eureka:10000/eureka/,http://eureka-1.eureka:10000/eureka/
+  instance:
+    instance-id: ${spring.cloud.client.ip-address}.${server.port}
+    prefer-ip-address: true
+
+# 开启所有management端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
