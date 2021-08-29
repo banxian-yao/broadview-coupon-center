@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coupon-user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coupon-user
+  template:
+    metadata:
+      labels:
+        app: coupon-user
+    spec:
+      restartPolicy: Always
+      containers:
+      - name: coupon-user
+        image: coupon-user
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 200m
+          limits:
+            memory: 1000Mi
+            cpu: 500m
+        livenessProbe: 
+          httpGet:
+            path: /actuator/health
+            port: 20002
+          initialDelaySeconds: 120 
+          periodSeconds: 60
+          timeoutSeconds: 10

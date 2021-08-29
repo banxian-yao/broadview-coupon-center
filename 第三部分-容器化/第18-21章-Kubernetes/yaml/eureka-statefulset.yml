@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: eureka
+spec:
+  serviceName: eureka
+  replicas: 2
+  selector:
+    matchLabels:
+      app: eureka
+  template:
+    metadata:
+      labels:
+        app: eureka
+    spec:
+      restartPolicy: Always
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - eureka
+              topologyKey: kubernetes.io/hostname
+      containers:
+      - name: eureka
+        image: eureka-server
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: 200Mi
+            cpu: 200m
+          limits:
+            memory: 1000Mi
+            cpu: 500m
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 10000
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 10000
+          initialDelaySeconds: 120
+          periodSeconds: 60
+          timeoutSeconds: 10
+
