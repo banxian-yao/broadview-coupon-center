@@ -1,0 +1,8 @@
+server:
+  port: 20001
+#  servlet:
+#    context-path: /coupon-calculation
+
+spring:
+  application:
+    name: coupon-calculator-service

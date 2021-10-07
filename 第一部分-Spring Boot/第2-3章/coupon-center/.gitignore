@@ -1,0 +1,24 @@
+*.iml
+target/
+*/*.iml
+*.project
+*.classpath
+.settings/
+.project
+.classpath
+test-output/
+*/test-output/
+*.log
+*.gz
+*/velocity.log
+.idea/
+*target/
+jobs/brim/final\ name
+jobs/brim/some\ file\ name
+jobs/brim/some\ testing\ file
+jobs/brim/tempFile
+jobs/brim/tempFileName
+jobs/brim/tmpFile
+jobs/financereport/*.csv
+
+*.swp

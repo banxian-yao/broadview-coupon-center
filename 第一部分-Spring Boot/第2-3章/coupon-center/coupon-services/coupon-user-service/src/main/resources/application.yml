@@ -1,0 +1,69 @@
+server:
+  port: 20002
+#  servlet:
+#    context-path: /coupon-user
+
+spring:
+  application:
+    name: coupon-user-service
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      retries: 3
+      acks: 1
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.format_sql: true
+      hibernate.show_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+
+  datasource:
+    # 数据源
+    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC
+    username: root
+    password: password
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 连接池
+    hikari:
+      connection-timeout: 20000
+      idle-timeout: 20000
+      maximum-pool-size: 20
+      minimum-idle: 5
+      max-lifetime: 30000
+      auto-commit: true
+      pool-name: BroadviewCouponHikari
+#  redis:
+#    database: 0
+#    host: 127.0.0.1
+#    port: 6379
+#    # password:
+#    # 连接超时时间
+#    timeout: 10000
+#  kafka:
+#    bootstrap-servers:
+#      - localhost:9092
+#    consumer:
+#      group-id: broadview-test
+#      auto-offset-reset: latest
+broadview.rabbitmq.exchange: broadview.direct
+broadview.rabbitmq.routingkey: broadview.routingkey
+
+broadview.templateserivce.url:
+    batch: "http://localhost:8080/template/getBatch"
+    single: "http://localhost:8080/template/get"
+
+broadview:
+  calculatserivce:
+    url: "/calculator/checkout"
