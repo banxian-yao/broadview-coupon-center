@@ -21,8 +21,8 @@ spring:
   datasource:
     # mysql数据源
     username: root
-    password: Broadview
-    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&serverTimezone=UTC
+    password: password
+    url: jdbc:mysql://127.0.0.1:3306/broadview_coupon_db?autoReconnect=true&useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=CONVERT_TO_NULL&serverTimezone=UTC
     type: com.zaxxer.hikari.HikariDataSource
     driver-class-name: com.mysql.cj.jdbc.Driver
     # 连接池
@@ -42,6 +42,7 @@ spring:
     properties:
       hibernate.format_sql: true
       hibernate.show_sql: true
+      hibernate.dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
   cache:
     type: redis

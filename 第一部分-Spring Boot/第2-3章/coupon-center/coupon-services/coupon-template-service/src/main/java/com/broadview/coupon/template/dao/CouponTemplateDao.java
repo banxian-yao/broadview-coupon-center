@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-
+/*
 @Repository
 public class CouponTemplateDao {
 
@@ -26,4 +26,4 @@ public class CouponTemplateDao {
     public void updateTemplate(Long id,String name){
         jdbcTemplate.update("update coupon_template set name=? where id=?", name,id);
     }
-}
+}*/

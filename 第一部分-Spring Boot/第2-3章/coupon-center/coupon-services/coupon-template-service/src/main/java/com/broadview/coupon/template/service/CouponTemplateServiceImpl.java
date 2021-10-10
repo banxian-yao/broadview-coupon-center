@@ -6,6 +6,7 @@ import com.broadview.coupon.template.beans.TemplateRequest;
 import com.broadview.coupon.template.converter.CouponTemplateConverter;
 import com.broadview.coupon.template.dao.CouponTemplateRepository;
 import com.broadview.coupon.template.entity.CouponTemplate;
+import com.broadview.coupon.template.entity.CouponTemplateEntity;
 import com.broadview.coupon.template.service.intf.CouponTemplateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,10 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -48,7 +52,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         }
 
         // 创建优惠券
-        CouponTemplate template = CouponTemplate.builder()
+        CouponTemplateEntity template = CouponTemplateEntity.builder()
                 .name(request.getName())
                 .description(request.getDesc())
                 .total(request.getTotal())
@@ -60,12 +64,12 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
                 .build();
         template = templateDao.save(template);
 
-        return template;
+        return CouponTemplateConverter.convertToTemplate(template);
     }
 
     @Override
     public List<TemplateInfo> searchTemplate(TemplateRequest request) {
-        CouponTemplate example = CouponTemplate.builder()
+        CouponTemplateEntity example = CouponTemplateEntity.builder()
                 .shopId(request.getShopId())
                 .category(CouponType.of(request.getType()))
                 .available(request.getAvailable())
@@ -74,7 +78,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
         // 可以用下面的方式做分页查询
 //        Pageable page = PageRequest.of(0, 100);
 //        templateDao.findAll(Example.of(example), page);
-        List<CouponTemplate> result = templateDao.findAll(Example.of(example));
+        List<CouponTemplateEntity> result = templateDao.findAll(Example.of(example));
         return result.stream()
                 .map(CouponTemplateConverter::convertToTemplateInfo)
                 .collect(Collectors.toList());
@@ -86,7 +90,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Override
     @Cacheable(value = "templates", key = "#id")
     public TemplateInfo loadTemplateInfo(Long id) {
-        Optional<CouponTemplate> template = templateDao.findById(id);
+        Optional<CouponTemplateEntity> template = templateDao.findById(id);
         if (!template.isPresent()) {
             return null;
         }
@@ -110,7 +114,7 @@ public class CouponTemplateServiceImpl implements CouponTemplateService {
     @Override
     public Map<Long, TemplateInfo> getTemplateInfoMap(Collection<Long> ids) {
 
-        List<CouponTemplate> templates = templateDao.findAllById(ids);
+        List<CouponTemplateEntity> templates = templateDao.findAllById(ids);
 
         return templates.stream()
                 .map(CouponTemplateConverter::convertToTemplateInfo)

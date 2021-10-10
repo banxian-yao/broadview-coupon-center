@@ -1,0 +1,7 @@
+spring:
+  jpa:
+    enerate-ddl: true
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
